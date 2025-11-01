@@ -171,6 +171,12 @@ export class NeonService {
   ): Promise<{ neonProjectId: string; databaseUrl: string }> {
     console.log("[Neon] Creating project with name:", name);
 
+    const orgId = process.env.NEON_ORG_ID;
+    invariant(
+      typeof orgId === "string" && orgId.length > 0,
+      "NEON_ORG_ID environment variable is required to create Neon projects",
+    );
+
     // Debug: Verify API key is loaded (show first/last 4 chars only)
     console.log(
       "[Neon] API key loaded:",
@@ -179,8 +185,12 @@ export class NeonService {
         : "NOT SET",
     );
     console.log("[Neon] API key length:", this.apiKey?.length);
+    console.log(
+      "[Neon] Org ID loaded:",
+      `${orgId.substring(0, 4)}...${orgId.substring(orgId.length - 4)}`,
+    );
 
-    const requestBody = { project: { name } };
+    const requestBody = { project: { name, org_id: orgId } };
     console.log("[Neon] Request body:", JSON.stringify(requestBody, null, 2));
 
     const res = await fetch(`${this.baseUrl}/projects`, {
